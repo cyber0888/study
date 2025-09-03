@@ -1,5 +1,5 @@
 ```javascript
-// Firebase konfiguratsiyasi (sizning loyiha ma'lumotlaringizni qo‘shing)
+// Firebase konfiguratsiyasi (sizning loyiha ma'lumotlaringizni tekshiring)
 const firebaseConfig = {
     apiKey: "AIzaSyAYbHeM6nDZgIdYBbxtxQvx4S0npE8lRwk",
     authDomain: "requered.firebaseapp.com",
@@ -32,6 +32,7 @@ function loadDb() {
         }
     }).catch(error => {
         console.error('Ma\'lumotlarni yuklashda xato:', error);
+        alert('Firebase bilan ulanishda muammo yuz berdi. Internetni tekshiring yoki sozlamalarni qayta ko\'rib chiqing.');
     });
 }
 
@@ -42,6 +43,7 @@ function saveDb() {
         adminKeys: Array.from(db.adminKeys)
     }).catch(error => {
         console.error('Ma\'lumotlarni saqlashda xato:', error);
+        alert('Ma\'lumotlarni saqlashda muammo yuz berdi. Internetni tekshiring.');
     });
 }
 
