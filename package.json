@@ -1,0 +1,8 @@
+{
+    "scripts": {
+        "start": "netlify dev"
+    },
+    "dependencies": {
+        "@netlify/neon": "^0.4.0"
+    }
+}
