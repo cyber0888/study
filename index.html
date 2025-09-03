@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O'qituvchi va O'quvchilar Sayti</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(45deg, #0a0a0a, #1a1a1a, #ff3333, #00ccff, #33ff33, #0a0a0a);
+            background-size: 600%;
+            color: #00ccff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            animation: backgroundMove 8s ease infinite;
+        }
+
+        @keyframes backgroundMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes neon-glow {
+            0% { text-shadow: 0 0 3px #00ccff, 0 0 5px #00ccff, 0 0 10px #00ccff; color: #00ccff; }
+            50% { text-shadow: 0 0 5px #00ccff, 0 0 8px #00ccff, 0 0 12px #00ccff; color: #99e6ff; }
+            100% { text-shadow: 0 0 3px #00ccff, 0 0 5px #00ccff, 0 0 10px #00ccff; color: #00ccff; }
+        }
+
+        .neon-text {
+            animation: neon-glow 2s ease-in-out infinite;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 204, 255, 0.4);
+            max-width: 600px;
+            width: 90%;
+            margin: 20px auto;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            margin: 10px 0;
+            border: 2px solid #00ccff;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e6f3ff;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: transparent;
+            border: 2px solid #00ccff;
+            color: #e6f3ff;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #00ccff;
+            color: #000;
+            box-shadow: 0 0 10px #00ccff;
+        }
+
+        .error {
+            color: #ff3333;
+            text-shadow: 0 0 3px #ff3333;
+        }
+
+        .developer-btn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-size: 12px;
+            padding: 5px 10px;
+            z-index: 1000;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .template-input {
+            display: block;
+            margin: 10px auto;
+            width: 80%;
+        }
+
+        #answers-list, #user-answers-list {
+            text-align: left;
+            margin: 20px auto;
+            width: 80%;
+        }
+
+        #codes-list {
+            text-align: left;
+            margin: 20px;
+        }
+
+        #codes-list button {
+            display: block;
+            margin: 10px auto;
+        }
+
+        #stats-section, #result-section {
+            margin: 20px;
+            color: #e6f3ff;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.9); /* Make results section stand out */
+            box-shadow: 0 0 20px rgba(0, 204, 255, 0.5);
+        }
+
+        #result-section ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #result-section li.correct {
+            color: #33ff33;
+            font-weight: bold;
+        }
+
+        #result-section li.error {
+            color: #ff3333;
+        }
+
+        #incorrect-answers {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ff3333;
+            border-radius: 5px;
+            background: rgba(255, 51, 51, 0.1);
+        }
+
+        #incorrect-answers li.correct-answer {
+            color: #33ff33;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <button class="developer-btn neon-text" id="developer-btn">Developer</button>
+    <div class="container">
+        <div id="user-info-section">
+            <h1 class="neon-text">Ismingizni Kiriting</h1>
+            <input type="text" id="first-name" placeholder="Ism">
+            <h1 class="neon-text">Familiyangizni Kiriting</h1>
+            <input type="text" id="last-name" placeholder="Familiya">
+            <button id="submit-user-info">Davom Etish</button>
+        </div>
+        <div id="main-section" class="hidden">
+            <h1 class="neon-text">Kodni Kiriting</h1>
+            <input type="text" id="code-input" placeholder="Masalan: 34">
+            <button id="submit-code">Kiriting</button>
+            <p id="error-msg" class="error hidden"></p>
+            <div id="test-section" class="hidden">
+                <h2 class="neon-text">Iltimos, Test Variantlarini Kiriting</h2>
+                <div id="user-answers-list"></div>
+                <button id="submit-answers">Tayyor</button>
+                <div id="result-section" class="hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="developer-modal" class="hidden">
+        <div class="container">
+            <h1 class="neon-text">Developer Kodini Kiriting</h1>
+            <input type="text" id="dev-code-input" placeholder="Parol">
+            <button id="submit-dev-code">Kiriting</button>
+            <p id="dev-error-msg" class="error hidden"></p>
+            <div id="owner-section" class="hidden">
+                <button id="add-code-btn">Kod Qo'shish</button>
+                <button id="add-admin-btn">Admin Qo'shish</button>
+                <button id="my-codes-btn">Kodlarim</button>
+            </div>
+            <div id="add-code-section" class="hidden">
+                <h2 class="neon-text">Kodni Yaratish</h2>
+                <input type="text" id="new-code" placeholder="Masalan: 123">
+                <h3 class="neon-text">Javoblarni Kiriting</h3>
+                <div id="answers-list"></div>
+                <button id="add-answer-template">Yangi Savol Qo'shish</button>
+                <button id="save-code">Tayyor</button>
+            </div>
+            <div id="add-admin-section" class="hidden">
+                <h2 class="neon-text">Kalit Yaratish</h2>
+                <input type="text" id="new-admin-key" placeholder="Masalan: hello">
+                <button id="save-admin">Saqlash</button>
+            </div>
+            <div id="admin-section" class="hidden">
+                <h2 class="neon-text">Admin Panel</h2>
+                <button id="add-code-btn-admin">Kod Qo'shish</button>
+            </div>
+            <div id="my-codes-section" class="hidden">
+                <h2 class="neon-text">Mening Kodlarim</h2>
+                <div id="codes-list"></div>
+                <button id="back-to-owner">Orqaga</button>
+            </div>
+            <div id="stats-section" class="hidden">
+                <h2 class="neon-text">Statistika</h2>
+                <div id="stats-content"></div>
+                <button id="back-to-codes">Orqaga</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulyatsiya qilish uchun localStorage dan foydalanamiz
+        const db = {
+            codes: {},
+            adminKeys: new Set(['lamborghini1']),
+            ownerPassword: 'lamborghini1'
+        };
+
+        // LocalStorage dan yuklash
+        if (localStorage.getItem('db')) {
+            const savedDb = JSON.parse(localStorage.getItem('db'));
+            db.codes = savedDb.codes;
+            db.adminKeys = new Set(savedDb.adminKeys);
+        }
+
+        // Saqlash funksiyasi
+        function saveDb() {
+            localStorage.setItem('db', JSON.stringify({
+                codes: db.codes,
+                adminKeys: Array.from(db.adminKeys)
+            }));
+        }
+
+        // Foydalanuvchi ma'lumotlari
+        let userName = '';
+
+        const userInfoSection = document.getElementById('user-info-section');
+        const firstName = document.getElementById('first-name');
+        const lastName = document.getElementById('last-name');
+        const submitUserInfo = document.getElementById('submit-user-info');
+        const mainSection = document.getElementById('main-section');
+
+        submitUserInfo.addEventListener('click', () => {
+            const fn = firstName.value.trim();
+            const ln = lastName.value.trim();
+            if (fn && ln) {
+                userName = `${fn} ${ln}`;
+                userInfoSection.classList.add('hidden');
+                mainSection.classList.remove('hidden');
+            } else {
+                alert('Ism va Familiya kerak!');
+            }
+        });
+
+        // Asosiy sahifa
+        const codeInput = document.getElementById('code-input');
+        const submitCode = document.getElementById('submit-code');
+        const errorMsg = document.getElementById('error-msg');
+        const testSection = document.getElementById('test-section');
+        const userAnswersList = document.getElementById('user-answers-list');
+        const submitAnswers = document.getElementById('submit-answers');
+        const resultSection = document.getElementById('result-section');
+
+        let currentCode = null;
+        let userAnswers = [];
+
+        submitCode.addEventListener('click', () => {
+            const code = codeInput.value.trim();
+            if (db.codes[code]) {
+                currentCode = code;
+                errorMsg.classList.add('hidden');
+                testSection.classList.remove('hidden');
+                renderUserAnswerTemplates(db.codes[code].answers.length);
+            } else {
+                errorMsg.textContent = 'Xato Kod';
+                errorMsg.classList.remove('hidden');
+            }
+        });
+
+        function renderUserAnswerTemplates(numQuestions) {
+            userAnswersList.innerHTML = '';
+            userAnswers = [];
+            for (let i = 1; i <= numQuestions; i++) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = `Savol ${i}`;
+                input.classList.add('template-input');
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        const nextInput = input.nextElementSibling;
+                        if (nextInput) nextInput.focus();
+                    }
+                });
+                userAnswersList.appendChild(input);
+                userAnswers.push(input);
+            }
+        }
+
+        submitAnswers.addEventListener('click', () => {
+            const correctAnswers = db.codes[currentCode].answers;
+            const userInputs = userAnswers.map(input => input.value.trim().toLowerCase());
+            let correctCount = 0;
+            let resultList = [];
+            let incorrectList = [];
+
+            userInputs.forEach((ans, idx) => {
+                if (ans === correctAnswers[idx]) {
+                    correctCount++;
+                    resultList.push(`<li class="correct">Savol ${idx + 1}: To'g'ri - ${correctAnswers[idx]}</li>`);
+                } else {
+                    resultList.push(`<li class="error">Savol ${idx + 1}: Xato - Sizning javobingiz: ${ans || 'bo\'sh'}</li>`);
+                    incorrectList.push(`<li>Savol ${idx + 1}: Sizning javobingiz: ${ans || 'bo\'sh'}, <span class="correct-answer">To'g'ri javob: ${correctAnswers[idx]}</span></li>`);
+                }
+            });
+
+            // Statistika qo'shish
+            if (!db.codes[currentCode].usage) db.codes[currentCode].usage = [];
+            db.codes[currentCode].usage.push({ user: userName, correct: correctCount, total: userInputs.length });
+            saveDb();
+
+            // Natija ekranga chiqariladi
+            resultSection.innerHTML = `
+                <h3 class="neon-text">Natija</h3>
+                <p>Jami savollar: ${userInputs.length}</p>
+                <p>To'g'ri javoblar: ${correctCount}</p>
+                <p>Xato javoblar: ${userInputs.length - correctCount}</p>
+                <h4>Barcha Natijalar:</h4>
+                <ul>${resultList.join('')}</ul>
+                ${incorrectList.length > 0 ? `
+                    <h4 class="error">Noto'g'ri Javoblar:</h4>
+                    <div id="incorrect-answers">
+                        <ul>${incorrectList.join('')}</ul>
+                    </div>
+                ` : ''}
+                <button id="back-to-test">Qayta Sinash</button>
+            `;
+            resultSection.classList.remove('hidden');
+            userAnswersList.classList.add('hidden'); // Hide answer inputs
+            submitAnswers.classList.add('hidden'); // Hide Tayyor button
+            testSection.querySelector('h2').classList.add('hidden'); // Hide the header
+
+            // Add event listener for back button
+            const backToTest = document.getElementById('back-to-test');
+            backToTest.addEventListener('click', () => {
+                resultSection.classList.add('hidden');
+                userAnswersList.classList.remove('hidden');
+                submitAnswers.classList.remove('hidden');
+                testSection.querySelector('h2').classList.remove('hidden');
+                renderUserAnswerTemplates(db.codes[currentCode].answers.length);
+            });
+        });
+
+        // Developer bo'limi
+        const developerBtn = document.getElementById('developer-btn');
+        const developerModal = document.getElementById('developer-modal');
+        const devCodeInput = document.getElementById('dev-code-input');
+        const submitDevCode = document.getElementById('submit-dev-code');
+        const devErrorMsg = document.getElementById('dev-error-msg');
+        const ownerSection = document.getElementById('owner-section');
+        const adminSection = document.getElementById('admin-section');
+        const addCodeBtn = document.getElementById('add-code-btn');
+        const addAdminBtn = document.getElementById('add-admin-btn');
+        const myCodesBtn = document.getElementById('my-codes-btn');
+        const addCodeSection = document.getElementById('add-code-section');
+        const newCode = document.getElementById('new-code');
+        const answersList = document.getElementById('answers-list');
+        const addAnswerTemplate = document.getElementById('add-answer-template');
+        const saveCode = document.getElementById('save-code');
+        const addAdminSection = document.getElementById('add-admin-section');
+        const newAdminKey = document.getElementById('new-admin-key');
+        const saveAdmin = document.getElementById('save-admin');
+        const addCodeBtnAdmin = document.getElementById('add-code-btn-admin');
+        const myCodesSection = document.getElementById('my-codes-section');
+        const codesList = document.getElementById('codes-list');
+        const backToOwner = document.getElementById('back-to-owner');
+        const statsSection = document.getElementById('stats-section');
+        const statsContent = document.getElementById('stats-content');
+        const backToCodes = document.getElementById('back-to-codes');
+
+        let isOwner = false;
+        let answerInputs = [];
+
+        developerBtn.addEventListener('click', () => {
+            developerModal.classList.remove('hidden');
+        });
+
+        submitDevCode.addEventListener('click', () => {
+            const devCode = devCodeInput.value.trim();
+            if (devCode === db.ownerPassword) {
+                isOwner = true;
+                showOwnerSection();
+            } else if (db.adminKeys.has(devCode)) {
+                isOwner = false;
+                showAdminSection();
+            } else {
+                devErrorMsg.textContent = 'Xato';
+                devErrorMsg.classList.remove('hidden');
+            }
+        });
+
+        function showOwnerSection() {
+            devErrorMsg.classList.add('hidden');
+            ownerSection.classList.remove('hidden');
+            devCodeInput.parentElement.querySelector('h1').classList.add('hidden');
+            devCodeInput.classList.add('hidden');
+            submitDevCode.classList.add('hidden');
+        }
+
+        function showAdminSection() {
+            devErrorMsg.classList.add('hidden');
+            adminSection.classList.remove('hidden');
+            devCodeInput.parentElement.querySelector('h1').classList.add('hidden');
+            devCodeInput.classList.add('hidden');
+            submitDevCode.classList.add('hidden');
+        }
+
+        addCodeBtn.addEventListener('click', showAddCodeSection);
+        addCodeBtnAdmin.addEventListener('click', showAddCodeSection);
+
+        function showAddCodeSection() {
+            addCodeSection.classList.remove('hidden');
+            ownerSection.classList.add('hidden');
+            adminSection.classList.add('hidden');
+            renderAnswerTemplates();
+        }
+
+        function renderAnswerTemplates() {
+            answersList.innerHTML = '';
+            answerInputs = [];
+        }
+
+        addAnswerTemplate.addEventListener('click', () => {
+            const qNum = answerInputs.length + 1;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = `Savol ${qNum}`;
+            input.classList.add('template-input');
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    addAnswerTemplate.click();
+                }
+            });
+            answersList.appendChild(input);
+            answerInputs.push(input);
+            input.focus();
+        });
+
+        saveCode.addEventListener('click', () => {
+            const code = newCode.value.trim();
+            if (code && answerInputs.length > 0) {
+                const answers = answerInputs.map(input => input.value.trim().toLowerCase());
+                if (answers.every(ans => ans)) {
+                    db.codes[code] = { answers, usage: [] };
+                    saveDb();
+                    alert('Kod qo\'shildi!');
+                    resetToDevMode();
+                } else {
+                    alert('Barcha javoblarni kiriting!');
+                }
+            } else {
+                alert('Kod va javoblar kerak!');
+            }
+        });
+
+        addAdminBtn.addEventListener('click', () => {
+            if (isOwner) {
+                addAdminSection.classList.remove('hidden');
+                ownerSection.classList.add('hidden');
+            }
+        });
+
+        saveAdmin.addEventListener('click', () => {
+            const key = newAdminKey.value.trim();
+            if (key) {
+                db.adminKeys.add(key);
+                saveDb();
+                alert('Admin kaliti qo\'shildi!');
+                resetToDevMode();
+            }
+        });
+
+        myCodesBtn.addEventListener('click', () => {
+            ownerSection.classList.add('hidden');
+            myCodesSection.classList.remove('hidden');
+            renderCodesList();
+        });
+
+        function renderCodesList() {
+            codesList.innerHTML = '';
+            Object.keys(db.codes).forEach(code => {
+                const btn = document.createElement('button');
+                btn.textContent = code;
+                btn.addEventListener('click', () => showStats(code));
+                codesList.appendChild(btn);
+            });
+        }
+
+        backToOwner.addEventListener('click', () => {
+            myCodesSection.classList.add('hidden');
+            ownerSection.classList.remove('hidden');
+        });
+
+        function showStats(code) {
+            myCodesSection.classList.add('hidden');
+            statsSection.classList.remove('hidden');
+            const usage = db.codes[code].usage;
+            let totalUsers = usage.length;
+            let totalCorrect = usage.reduce((sum, u) => sum + u.correct, 0);
+            let details = usage.map(u => `<li>${u.user}: ${u.correct} / ${u.total}</li>`).join('');
+
+            statsContent.innerHTML = `
+                <p>Foydalanuvchilar soni: ${totalUsers}</p>
+                <p>Jami to'g'ri javoblar: ${totalCorrect}</p>
+                <ul>${details}</ul>
+            `;
+        }
+
+        backToCodes.addEventListener('click', () => {
+            statsSection.classList.add('hidden');
+            myCodesSection.classList.remove('hidden');
+        });
+
+        function resetToDevMode() {
+            addCodeSection.classList.add('hidden');
+            addAdminSection.classList.add('hidden');
+            if (isOwner) {
+                ownerSection.classList.remove('hidden');
+            } else {
+                adminSection.classList.remove('hidden');
+            }
+            newCode.value = '';
+            newAdminKey.value = '';
+            renderAnswerTemplates();
+        }
+
+        // Modalni yopish uchun tashqariga bosish
+        window.addEventListener('click', (e) => {
+            if (e.target === developerModal) {
+                developerModal.classList.add('hidden');
+                resetToDevMode();
+                devCodeInput.value = '';
+                devErrorMsg.classList.add('hidden');
+                devCodeInput.parentElement.querySelector('h1').classList.remove('hidden');
+                devCodeInput.classList.remove('hidden');
+                submitDevCode.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
