@@ -1,4 +1,3 @@
-```javascript
 // Firebase konfiguratsiyasi (sizning loyiha ma'lumotlaringizni tekshiring)
 const firebaseConfig = {
     apiKey: "AIzaSyAYbHeM6nDZgIdYBbxtxQvx4S0npE8lRwk",
